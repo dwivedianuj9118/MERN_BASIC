@@ -5,8 +5,12 @@ const {Schema}=mongoose;
 const UserSchema=new Schema({
   name:  {type:String, required:true},
   email: { type: String, unique: true, required: true },
-  password: { type: String, required: true },
-  bio: { type: String,required: true },
+  password: { 
+    type: String, 
+    required: true,
+    select: false
+  },
+  bio: { type: String,required: false },
 });
 
 UserSchema.pre('save', async function(next) {
