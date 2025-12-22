@@ -1,11 +1,10 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import cookieParser from 'cookie-parser';
 import connectDB from './config/database.js';
-import { registerUser,loginUser, getUserProfile, updateUserProfile } from './controllers/authenticateController.js';
+import { registerUser,loginUser, getUserProfile, updateUserProfile, updateProfilePic,deleteProfile } from './controllers/authenticateController.js';
 import protect from './middleware/authMiddleware.js';
-
+import upload from './middleware/fileUploadMiddleware.js';
 dotenv.config();
 connectDB();
 
@@ -27,8 +26,13 @@ app.post('/data', (req, res) => {
 
 app.post('/register', registerUser);
 app.post('/login', loginUser);
-app.post('/updateUserProfile',protect, updateUserProfile);
+app.put('/updateUserProfile',protect, updateUserProfile);
 app.get('/getUserProfile',protect, getUserProfile);
+
+app.post('/updateProfilePic',protect, upload.single('profilePic'),updateProfilePic)
+app.use('/uploads', express.static('uploads'));
+
+app.delete('/deleteAccount', protect, deleteProfile);
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);

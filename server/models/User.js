@@ -11,6 +11,7 @@ const UserSchema=new Schema({
     select: false
   },
   bio: { type: String,required: false },
+  profilePic : { type: String, required: false },
 });
 
 UserSchema.pre('save', async function(next) {

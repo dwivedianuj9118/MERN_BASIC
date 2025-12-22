@@ -1,4 +1,4 @@
-import { data } from 'react-router-dom';
+import path from 'path';
 import User from '../models/User.js';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
@@ -65,13 +65,44 @@ export const getUserProfile = async (req,res) =>{
         }
         const {name, email, bio} = req.body;
         
-        let userData = mongoose.model('User');
-        var thing = new userData({ name: name, email: email, bio: bio });
-        thing.save(); 
-        
+        // let userData = mongoose.model('User');
+        // var thing = new userData({ name: name, email: email, bio: bio });
+        // thing.save(); 
+        const thing = await User.findByIdAndUpdate(req.user._id, {name, email, bio}, {new: true});
+    
         res.status(200).json({message:'User Profile Updated',data: thing});
     }catch(error){
         res.status(500).json({message: error.message});
     }
  }  
+export const updateProfilePic = async (req,res) =>{  
+    console.log(req.file);
+    try{
+        if(!req.file){
+            return res.status(400).json({message: 'No file uploaded'});
+        }
+        const picPath = `uploads/${req.file.filename}`;
+        const user = await User.findById(req.user._id);
+        if(!user){
+            return res.status(404).json({message: 'User not found'});
+        }
+        const updateImage  = await User.findByIdAndUpdate(req.user._id, {profilePic: picPath}, {new: true});
+        
+        res.status(200).json({message:'User Profile Updated',data: updateImage});
+    }catch(error){
+        res.status(500).json({message: error.message});
+    }
+ } 
+export const deleteProfile = async (req,res) =>{  
+    try{
+        const user = await User.findById(req.user._id);
+        if(!user){
+            return res.status(404).json({message: 'User not found'});
+        }
+        const data  = await User.deleteOne(req.user._id);
 
+        res.status(200).json({message:'User Profile Deleted',data: data});
+    }catch(error){
+        res.status(500).json({message: error.message});
+    }
+ } 
